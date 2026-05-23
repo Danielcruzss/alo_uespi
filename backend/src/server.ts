@@ -1,23 +1,20 @@
-import express from 'express';
-import cors from 'cors';
-import 'dotenv/config';
-import { manifestacaoRoutes } from './routes/manifestacaoRoutes';
-import { errorHandler } from './middleware/errorHandler';
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.json({ message: 'Alô UESPI funcionando' });
+app.get("/", (req, res) => {
+  res.json({ message: "API Alô UESPI funcionando" });
 });
 
-app.use('/manifestacoes', manifestacaoRoutes);
-app.use(errorHandler);
+const PORT = 3333;
 
-const port = Number(process.env.PORT || 3333);
-app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
-
