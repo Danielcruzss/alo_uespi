@@ -8,10 +8,12 @@
     "start": "node dist/server.js"
   },
   "dependencies": {
+    "@prisma/client": "^6.19.3",
     "cors": "latest",
     "dotenv": "latest",
     "express": "latest",
     "mysql2": "latest",
+    "prisma": "^6.19.3",
     "zod": "latest"
   },
   "devDependencies": {
