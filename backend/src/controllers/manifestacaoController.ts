@@ -8,7 +8,7 @@ const criarManifestacaoSchema = z.object({
   tipo: z.enum(["RECLAMACAO", "DENUNCIA", "SUGESTAO", "SOLICITACAO", "ELOGIO"]),
   categoria: z.string().min(3),
   titulo: z.string().min(5),
-  descricao: z.string().min(10),
+  descricao: z.string().min(10, "A descrição precisa ter pelo menos 10 caracteres."),
   anonima: z.boolean().default(true),
   nomeUsuario: z.string().optional(),
   emailUsuario: z.string().email().optional().or(z.literal("")),
