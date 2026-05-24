@@ -12,56 +12,16 @@ export function definirPrioridade(tipo: TipoManifestacao) {
 }
 
 export function definirSetor(categoria: string) {
-  const texto = categoria.toLowerCase();
+  const setoresPorCategoria: Record<string, number> = {
+    curso_disciplina: 1,
+    infraestrutura: 2,
+    assistencia_estudantil: 3,
+    biblioteca: 4,
+    tecnologia: 5,
+    atendimento: 6,
+    outros: 6,
+  };
 
-  if (
-    texto.includes('infraestrutura') ||
-    texto.includes('estrutura') ||
-    texto.includes('sala') ||
-    texto.includes('banheiro') ||
-    texto.includes('laboratorio') ||
-    texto.includes('laboratório')
-  ) {
-    return 2;
-  }
-
-  if (
-    texto.includes('assistencia') ||
-    texto.includes('bolsa') ||
-    texto.includes('auxilio') ||
-    texto.includes('auxílio') ||
-    texto.includes('estudantil') ||
-    texto.includes('assistência')
-  ) {
-    return 3;
-  }
-
-  if (
-    texto.includes('biblioteca') ||
-    texto.includes('livro') ||
-    texto.includes('acervo')
-  ) {
-    return 4;
-  }
-
-  if (
-    texto.includes('sistema') ||
-    texto.includes('site') ||
-    texto.includes('internet') ||
-    texto.includes('ti') ||
-    texto.includes('tecnologia')
-  ) {
-    return 5;
-  }
-
-  if (
-    texto.includes('curso') ||
-    texto.includes('disciplina') ||
-    texto.includes('professor') ||
-    texto.includes('aula')
-  ) {
-    return 1;
-  }
-
-  return 6;
+  return setoresPorCategoria[categoria] || 6;
 }
+
