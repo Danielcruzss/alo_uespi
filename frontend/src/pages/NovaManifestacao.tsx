@@ -69,11 +69,16 @@ export function NovaManifestacao() {
 
         <label>Categoria</label>
 
-        <input
-          name="categoria"
-          placeholder="Ex: infraestrutura, curso, assistência estudantil"
-          required
-        />
+        <select name="categoria" required>
+          <option value="">Selecione uma categoria</option>
+          <option value="infraestrutura">Infraestrutura</option>
+          <option value="assistencia_estudantil">Assistência Estudantil</option>
+          <option value="curso_disciplina">Curso ou Disciplina</option>
+          <option value="biblioteca">Biblioteca</option>
+          <option value="tecnologia">Tecnologia da Informação</option>
+          <option value="atendimento">Atendimento Institucional</option>
+          <option value="outros">Outros</option>
+        </select>
 
         <label>Título</label>
 
