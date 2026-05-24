@@ -13,8 +13,55 @@ export function definirPrioridade(tipo: TipoManifestacao) {
 
 export function definirSetor(categoria: string) {
   const texto = categoria.toLowerCase();
-  if (texto.includes('infra') || texto.includes('estrutura')) return 4;
-  if (texto.includes('assist') || texto.includes('bolsa')) return 3;
-  if (texto.includes('curso') || texto.includes('disciplina')) return 2;
-  return 1;
+
+  if (
+    texto.includes('infraestrutura') ||
+    texto.includes('estrutura') ||
+    texto.includes('sala') ||
+    texto.includes('banheiro') ||
+    texto.includes('laboratorio') ||
+    texto.includes('laboratório')
+  ) {
+    return 2;
+  }
+
+  if (
+    texto.includes('assistencia') ||
+    texto.includes('bolsa') ||
+    texto.includes('auxilio') ||
+    texto.includes('auxílio') ||
+    texto.includes('estudantil') ||
+    texto.includes('assistência')
+  ) {
+    return 3;
+  }
+
+  if (
+    texto.includes('biblioteca') ||
+    texto.includes('livro') ||
+    texto.includes('acervo')
+  ) {
+    return 4;
+  }
+
+  if (
+    texto.includes('sistema') ||
+    texto.includes('site') ||
+    texto.includes('internet') ||
+    texto.includes('ti') ||
+    texto.includes('tecnologia')
+  ) {
+    return 5;
+  }
+
+  if (
+    texto.includes('curso') ||
+    texto.includes('disciplina') ||
+    texto.includes('professor') ||
+    texto.includes('aula')
+  ) {
+    return 1;
+  }
+
+  return 6;
 }

@@ -10,31 +10,53 @@ type Manifestacao = {
   prioridade: string;
   status: string;
   anonima: boolean;
-  setor: string;
-  criado_em: string;
+  criadoEm: string;
+  setor: {
+    id: number;
+    nome: string;
+    email?: string | null;
+  } | null;
 };
 
 export function Admin() {
   const [items, setItems] = useState<Manifestacao[]>([]);
+  const [erro, setErro] = useState('');
 
   async function carregar() {
-    const { data } = await api.get('/manifestacoes/admin/listar');
-    setItems(data);
+    try {
+      const { data } = await api.get('/manifestacoes');
+      setItems(data);
+      setErro('');
+    } catch (error) {
+      console.log('Erro ao carregar manifestações:', error);
+      setErro('Não foi possível carregar as manifestações.');
+      setItems([]);
+    }
   }
 
   async function atualizar(id: number, status: string) {
-    await api.patch(`/manifestacoes/admin/${id}`, { status });
-    carregar();
+    try {
+      await api.patch(`/manifestacoes/${id}`, { status });
+      carregar();
+    } catch (error) {
+      console.log('Erro ao atualizar manifestação:', error);
+      setErro('Não foi possível atualizar a manifestação.');
+    }
   }
 
   useEffect(() => {
-    carregar().catch(() => setItems([]));
+    carregar();
   }, []);
 
   return (
     <section className="card">
       <h2>Painel administrativo</h2>
-      <p className="muted">Versão inicial para equipe da ouvidoria acompanhar demandas.</p>
+
+      <p className="muted">
+        Versão inicial para equipe da ouvidoria acompanhar demandas.
+      </p>
+
+      {erro && <div className="error">{erro}</div>}
 
       <div className="table-wrapper">
         <table>
@@ -49,17 +71,23 @@ export function Admin() {
               <th>Ação</th>
             </tr>
           </thead>
+
           <tbody>
             {items.map((item) => (
               <tr key={item.id}>
                 <td>{item.protocolo}</td>
                 <td>{item.tipo}</td>
                 <td>{item.titulo}</td>
-                <td>{item.setor}</td>
-                <td><span className="pill">{item.prioridade}</span></td>
+                <td>{item.setor?.nome || 'Não definido'}</td>
+                <td>
+                  <span className="pill">{item.prioridade}</span>
+                </td>
                 <td>{item.status}</td>
                 <td>
-                  <select value={item.status} onChange={(e) => atualizar(item.id, e.target.value)}>
+                  <select
+                    value={item.status}
+                    onChange={(e) => atualizar(item.id, e.target.value)}
+                  >
                     <option value="RECEBIDA">Recebida</option>
                     <option value="EM_ANALISE">Em análise</option>
                     <option value="ENCAMINHADA">Encaminhada</option>

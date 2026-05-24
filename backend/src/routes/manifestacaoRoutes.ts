@@ -1,14 +1,14 @@
-import { Router } from 'express';
+import { Router } from "express";
 import {
-  atualizarManifestacao,
-  consultarPorProtocolo,
   criarManifestacao,
+  consultarPorProtocolo,
   listarManifestacoes,
-} from '../controllers/manifestacaoController';
+  atualizarManifestacao,
+} from "../controllers/manifestacaoController";
 
 export const manifestacaoRoutes = Router();
 
-manifestacaoRoutes.post('/', criarManifestacao);
-manifestacaoRoutes.get('/protocolo/:protocolo', consultarPorProtocolo);
-manifestacaoRoutes.get('/admin/listar', listarManifestacoes);
-manifestacaoRoutes.patch('/admin/:id', atualizarManifestacao);
+manifestacaoRoutes.post("/", criarManifestacao);
+manifestacaoRoutes.get("/", listarManifestacoes);
+manifestacaoRoutes.get("/:protocolo", consultarPorProtocolo);
+manifestacaoRoutes.patch("/:id", atualizarManifestacao);

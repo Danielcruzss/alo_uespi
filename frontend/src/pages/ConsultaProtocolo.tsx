@@ -1,29 +1,36 @@
 import { useState } from 'react';
 import { api } from '../api/client';
 
+type ResultadoManifestacao = {
+  titulo: string;
+  status: string;
+  prioridade: string;
+  resposta?: string | null;
+  setor: {
+    id: number;
+    nome: string;
+    email?: string | null;
+  } | null;
+};
+
 export function ConsultaProtocolo() {
-  const [resultado, setResultado] = useState<any>(null);
+  const [resultado, setResultado] = useState<ResultadoManifestacao | null>(null);
   const [erro, setErro] = useState('');
 
-  async function consultar(
-    event: React.SyntheticEvent<HTMLFormElement>
-    //    event: React.FormEvent<HTMLFormElement>
-  ) {
+  async function consultar(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     setErro('');
     setResultado(null);
 
     const form = new FormData(event.currentTarget);
-    const protocolo = form.get('protocolo');
+    const protocolo = String(form.get('protocolo') || '').trim();
 
     try {
-      const { data } = await api.get(
-        `/manifestacoes/protocolo/${protocolo}`
-      );
-
+      const { data } = await api.get(`/manifestacoes/${protocolo}`);
       setResultado(data);
-    } catch {
+    } catch (error) {
+      console.log('Erro ao consultar protocolo:', error);
       setErro('Protocolo não encontrado.');
     }
   }
@@ -57,7 +64,8 @@ export function ConsultaProtocolo() {
           </p>
 
           <p>
-            <strong>Setor:</strong> {resultado.setor}
+            <strong>Setor:</strong>{' '}
+            {resultado.setor?.nome || 'Não definido'}
           </p>
 
           <p>

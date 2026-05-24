@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { manifestacaoRoutes } from "./routes/manifestacaoRoutes";
 
 dotenv.config();
 
@@ -12,6 +13,8 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.json({ message: "API Alô UESPI funcionando" });
 });
+
+app.use("/manifestacoes", manifestacaoRoutes);
 
 const PORT = 3333;
 
