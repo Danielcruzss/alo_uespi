@@ -4,13 +4,16 @@ import {
   Search,
   ShieldCheck,
   Home,
+  User,
 } from 'lucide-react';
 
 import { NovaManifestacao } from './pages/NovaManifestacao';
 import { ConsultaProtocolo } from './pages/ConsultaProtocolo';
+import { User } from "lucide-react";
+import { Login } from "./pages/Login";
 import { Admin } from './pages/Admin';
 
-type Tela = 'inicio' | 'nova' | 'consulta' | 'admin';
+type Tela = 'inicio' | 'nova' | 'consulta' | 'admin' | 'login';
 
 function Inicio() {
   return (
@@ -117,6 +120,14 @@ export function App() {
         >
           <ShieldCheck size={18} /> Painel admin
         </button>
+
+        <button 
+          onClick={() => setTela ("login")}
+          className={tela == 'login' ? 'active' : ''}
+          >
+            <User size={18} /> Entrar
+            </button>
+
       </nav>
 
       <main>
@@ -124,6 +135,8 @@ export function App() {
         {tela === 'nova' && <NovaManifestacao />}
         {tela === 'consulta' && <ConsultaProtocolo />}
         {tela === 'admin' && <Admin />}
+        {tela === 'login' && <Login />}
+        
       </main>
     </div>
   );
