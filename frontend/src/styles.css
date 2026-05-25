@@ -256,3 +256,17 @@ th {
     flex-direction: column;
   }
 }
+
+.link-button {
+  margin-top: 12px;
+  background: transparent;
+  color: #123b7a;
+  box-shadow: none;
+  padding-left: 0;
+  font-weight: 700;
+}
+
+.link-button:hover {
+  text-decoration: underline;
+} 
+
