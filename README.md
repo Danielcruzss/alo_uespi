@@ -44,4 +44,4 @@ A plataforma busca aumentar a transparência, acessibilidade e eficiência na co
 ### Clone o repositório
 
 ```bash
-git clone https://github.com/seuusuario/alo-uespi.git
+git clone https://github.com/Danielcruzss/alo_uespi.git
