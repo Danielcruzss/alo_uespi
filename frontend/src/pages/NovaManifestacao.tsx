@@ -60,6 +60,7 @@ export function NovaManifestacao() {
         <label>Tipo</label>
 
         <select name="tipo" required>
+          <option value="">Selecione o tipo da manifestação</option>
           <option value="RECLAMACAO">Reclamação</option>
           <option value="DENUNCIA">Denúncia</option>
           <option value="SUGESTAO">Sugestão</option>
