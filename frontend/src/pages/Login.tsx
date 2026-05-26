@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { api } from "../api/client";
 
 type Usuario = {
@@ -12,6 +12,13 @@ export function Login() {
     const [usuario, setUsuario] = useState<Usuario | null>(null);
     const [erro, setErro] = useState("");
     const [sucesso, setSucesso] = useState("");
+    useEffect(() => {
+    const usuarioSalvo = localStorage.getItem("usuario");
+
+    if (usuarioSalvo) {
+      setUsuario(JSON.parse(usuarioSalvo));
+    }
+  }, []);
 
     async function enviar(event: FormEvent<HTMLFormElement>) {
   event.preventDefault();

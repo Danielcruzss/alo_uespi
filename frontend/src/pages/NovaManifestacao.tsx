@@ -7,53 +7,64 @@ export function NovaManifestacao() {
   const [erro, setErro] = useState('');
 
   async function enviar(event: FormEvent<HTMLFormElement>) {
-  event.preventDefault();
+    event.preventDefault();
 
-  const formulario = event.currentTarget;
-
-  setErro('');
-  setProtocolo('');
-
-  const form = new FormData(formulario);
-
-  const payload: any = {
-    tipo: String(form.get('tipo') || ''),
-    categoria: String(form.get('categoria') || ''),
-    titulo: String(form.get('titulo') || ''),
-    descricao: String(form.get('descricao') || ''),
-    anonima,
-  };
-
-  if (!anonima) {
-    payload.nomeUsuario = String(form.get('nomeUsuario') || '');
-    payload.emailUsuario = String(form.get('emailUsuario') || '');
-  }
-
-  try {
-    const { data } = await api.post('/manifestacoes', payload);
+    const formulario = event.currentTarget;
 
     setErro('');
-    setProtocolo(data.protocolo);
-
-    formulario.reset();
-    setAnonima(true);
-  } catch (error: any) {
-    console.log('Erro ao registrar:', error.response?.data || error);
-
     setProtocolo('');
-    setErro(
-      error.response?.data?.message ||
-      'Não foi possível registrar. Confira os dados e tente novamente.'
-    );
+
+    const form = new FormData(formulario);
+
+    const payload = {
+      tipo: String(form.get('tipo') || ''),
+      categoria: String(form.get('categoria') || ''),
+      titulo: String(form.get('titulo') || ''),
+      descricao: String(form.get('descricao') || ''),
+      anonima,
+    };
+
+    try {
+      const token = localStorage.getItem('token');
+
+      if (!anonima && !token) {
+        setErro(
+          'Para registrar uma manifestação identificada, você precisa fazer login.'
+        );
+        return;
+      }
+
+      const { data } = await api.post('/manifestacoes', payload, {
+        headers: token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : {},
+      });
+
+      setErro('');
+      setProtocolo(data.protocolo);
+
+      formulario.reset();
+      setAnonima(true);
+    } catch (error: any) {
+      console.log('Erro ao registrar:', error.response?.data || error);
+
+      setProtocolo('');
+      setErro(
+        error.response?.data?.message ||
+          'Não foi possível registrar. Confira os dados e tente novamente.'
+      );
+    }
   }
-}
 
   return (
     <section className="card">
       <h2>Registrar manifestação</h2>
 
       <p className="muted">
-        Você pode registrar uma manifestação anônima ou identificada.
+        Você pode registrar uma manifestação anônima ou identificada. Para
+        manifestações identificadas, é necessário estar logado na plataforma.
       </p>
 
       <form onSubmit={enviar} className="form">
@@ -108,26 +119,9 @@ export function NovaManifestacao() {
         </label>
 
         {!anonima && (
-          <div className="grid">
-            <div>
-              <label>Nome</label>
-
-              <input
-                name="nomeUsuario"
-                placeholder="Seu nome"
-              />
-            </div>
-
-            <div>
-              <label>E-mail</label>
-
-              <input
-                name="emailUsuario"
-                type="email"
-                placeholder="seu@email.com"
-              />
-            </div>
-          </div>
+          <p className="muted">
+            Esta manifestação será vinculada ao usuário logado.
+          </p>
         )}
 
         <button type="submit">
@@ -150,3 +144,4 @@ export function NovaManifestacao() {
     </section>
   );
 }
+

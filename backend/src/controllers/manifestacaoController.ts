@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "../lib/prisma";
 import { definirPrioridade, definirSetor } from "../services/classificacao";
 import { gerarProtocolo } from "../utils/protocolo";
+import { AuthRequest } from "../middleware/autenticador2";
 
 const criarManifestacaoSchema = z.object({
   tipo: z.enum(["RECLAMACAO", "DENUNCIA", "SUGESTAO", "SOLICITACAO", "ELOGIO"]),
@@ -10,8 +11,6 @@ const criarManifestacaoSchema = z.object({
   titulo: z.string().min(5),
   descricao: z.string().min(10, "A descrição precisa ter pelo menos 10 caracteres."),
   anonima: z.boolean().default(true),
-  nomeUsuario: z.string().optional(),
-  emailUsuario: z.string().email().optional().or(z.literal("")),
 });
 
 const atualizarStatusSchema = z.object({
@@ -19,9 +18,15 @@ const atualizarStatusSchema = z.object({
   resposta: z.string().optional(),
 });
 
-export async function criarManifestacao(req: Request, res: Response): Promise<void> {
+export async function criarManifestacao(req: AuthRequest, res: Response): Promise<void> {
   try {
     const dados = criarManifestacaoSchema.parse(req.body);
+    if (!req.usuarioId) {
+      res.status(401).json({
+      message: "Usuário não autenticado.",
+    });
+  return;
+}
 
     const protocolo = gerarProtocolo();
     const prioridade = definirPrioridade(dados.tipo);
@@ -42,8 +47,9 @@ export async function criarManifestacao(req: Request, res: Response): Promise<vo
         titulo: dados.titulo,
         descricao: dados.descricao,
         anonima: dados.anonima,
-        nomeUsuario: dados.anonima ? null : dados.nomeUsuario || null,
-        emailUsuario: dados.anonima ? null : dados.emailUsuario || null,
+        nomeUsuario: null,
+        emailUsuario: null,
+        usuarioId: req.usuarioId,
         prioridade,
         setorId: setor ? setor.id : null,
       },
