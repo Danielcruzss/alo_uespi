@@ -11,6 +11,7 @@ type Manifestacao = {
   status: string;
   anonima: boolean;
   criadoEm: string;
+  resposta?: string | null;
   setor: {
     id: number;
     nome: string;
@@ -21,10 +22,12 @@ type Manifestacao = {
 export function Admin() {
   const [items, setItems] = useState<Manifestacao[]>([]);
   const [erro, setErro] = useState('');
+  const [respostas, setRespostas] = useState<Record<number, string>>({});
 
   async function carregar() {
     try {
       const { data } = await api.get('/manifestacoes');
+
       setItems(data);
       setErro('');
     } catch (error) {
@@ -36,11 +39,66 @@ export function Admin() {
 
   async function atualizar(id: number, status: string) {
     try {
-      await api.patch(`/manifestacoes/${id}`, { status });
-      carregar();
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        setErro('Você precisa estar logado como administrador.');
+        return;
+      }
+
+      await api.patch(
+        `/manifestacoes/${id}`,
+        { status },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setErro('');
+      await carregar();
     } catch (error) {
       console.log('Erro ao atualizar manifestação:', error);
       setErro('Não foi possível atualizar a manifestação.');
+    }
+  }
+
+  async function responder(id: number, resposta: string) {
+    try {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        setErro('Você precisa estar logado como administrador.');
+        return;
+      }
+
+      if (!resposta.trim()) {
+        setErro('Digite uma resposta antes de enviar.');
+        return;
+      }
+
+      await api.put(
+        `/manifestacoes/${id}/responder`,
+        { resposta },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setErro('');
+
+      setRespostas((respostasAtuais) => ({
+        ...respostasAtuais,
+        [id]: '',
+      }));
+
+      await carregar();
+    } catch (error) {
+      console.log('Erro ao responder manifestação:', error);
+      setErro('Não foi possível responder a manifestação.');
     }
   }
 
@@ -53,13 +111,13 @@ export function Admin() {
       <h2>Painel administrativo</h2>
 
       <p className="muted">
-        Versão inicial para equipe da ouvidoria acompanhar demandas.
+        Acompanhe, atualize e responda às manifestações registradas na plataforma.
       </p>
 
       {erro && <div className="error">{erro}</div>}
 
       <div className="table-wrapper">
-        <table>
+        <table className="admin-table">
           <thead>
             <tr>
               <th>Protocolo</th>
@@ -68,6 +126,7 @@ export function Admin() {
               <th>Setor</th>
               <th>Prioridade</th>
               <th>Status</th>
+              <th>Resposta</th>
               <th>Ação</th>
             </tr>
           </thead>
@@ -79,11 +138,45 @@ export function Admin() {
                 <td>{item.tipo}</td>
                 <td>{item.titulo}</td>
                 <td>{item.setor?.nome || 'Não definido'}</td>
+
                 <td>
                   <span className="pill">{item.prioridade}</span>
                 </td>
+
                 <td>{item.status}</td>
+
                 <td>
+                  <div className="admin-response-box">
+                    {item.resposta && (
+                      <div className="current-response">
+                        <strong>Resposta atual:</strong>
+                        <p>{item.resposta}</p>
+                      </div>
+                    )}
+
+                    <textarea
+                      value={respostas[item.id] || ''}
+                      onChange={(e) =>
+                        setRespostas({
+                          ...respostas,
+                          [item.id]: e.target.value,
+                        })
+                      }
+                      placeholder="Digite a resposta"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        responder(item.id, respostas[item.id] || '')
+                      }
+                    >
+                      Responder
+                    </button>
+                  </div>
+                </td>
+
+                <td className="admin-actions">
                   <select
                     value={item.status}
                     onChange={(e) => atualizar(item.id, e.target.value)}
@@ -97,6 +190,14 @@ export function Admin() {
                 </td>
               </tr>
             ))}
+
+            {items.length === 0 && (
+              <tr>
+                <td colSpan={8}>
+                  Nenhuma manifestação encontrada.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

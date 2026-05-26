@@ -4,10 +4,12 @@ import jwt from "jsonwebtoken";
 type TokenPayload = {
   id: number;
   email: string;
+  admin?: boolean;
 };
 
 export type AuthRequest = Request & {
   usuarioId?: number;
+  admin?: boolean;
 };
 
 const JWT_SECRET = process.env.JWT_SECRET || "segredo_temporario_mvp";
@@ -39,6 +41,7 @@ export function autenticarUsuario(
     const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
 
     req.usuarioId = decoded.id;
+    req.admin = decoded.admin || false;
 
     next();
   } catch {
@@ -47,4 +50,36 @@ export function autenticarUsuario(
     });
     return;
   }
+}
+
+export function autenticarUsuarioOpcional(
+  req: AuthRequest,
+  _res: Response,
+  next: NextFunction
+): void {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    next();
+    return;
+  }
+
+  const [, token] = authHeader.split(" ");
+
+  if (!token) {
+    next();
+    return;
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
+
+    req.usuarioId = decoded.id;
+    req.admin = decoded.admin || false;
+  } catch {
+    // Se o token estiver inválido, segue sem usuário.
+    // Isso permite manifestações anônimas.
+  }
+
+  next();
 }

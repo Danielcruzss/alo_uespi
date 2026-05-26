@@ -21,12 +21,13 @@ const atualizarStatusSchema = z.object({
 export async function criarManifestacao(req: AuthRequest, res: Response): Promise<void> {
   try {
     const dados = criarManifestacaoSchema.parse(req.body);
-    if (!req.usuarioId) {
+    if (!dados.anonima && !req.usuarioId) {
       res.status(401).json({
-      message: "Usuário não autenticado.",
-    });
-  return;
-}
+        message: "Você precisa estar logado para registrar uma manifestação identificada.",
+      });
+      return;
+    }
+
 
     const protocolo = gerarProtocolo();
     const prioridade = definirPrioridade(dados.tipo);
@@ -39,6 +40,12 @@ export async function criarManifestacao(req: AuthRequest, res: Response): Promis
       },
     });
 
+    const usuarioId: number | null = dados.anonima
+      ? null
+      : req.usuarioId ?? null;
+
+    const setorId: number | null = setor ? setor.id : null;
+
     const manifestacao = await prisma.manifestacao.create({
       data: {
         protocolo,
@@ -49,9 +56,9 @@ export async function criarManifestacao(req: AuthRequest, res: Response): Promis
         anonima: dados.anonima,
         nomeUsuario: null,
         emailUsuario: null,
-        usuarioId: req.usuarioId,
+        usuarioId,
         prioridade,
-        setorId: setor ? setor.id : null,
+        setorId,
       },
     });
 
@@ -135,4 +142,34 @@ export async function atualizarManifestacao(
 
   res.json({ message: "Manifestação atualizada com sucesso." });
   return;
+}
+
+export async function responderManifestacao(
+  req: Request<{ id: string }>,
+  res: Response
+): Promise<void> {
+  try {
+    const { id } = req.params;
+    const { resposta } = req.body;
+
+    const manifestacao = await prisma.manifestacao.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        resposta,
+        status: "RESPONDIDA",
+      },
+    });
+
+    res.json(manifestacao);
+    return;
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      erro: "Erro ao responder manifestação",
+    });
+    return;
+  }
 }

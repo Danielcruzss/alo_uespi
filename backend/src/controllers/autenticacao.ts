@@ -91,6 +91,7 @@ export async function loginUsuario(req: Request, res: Response): Promise<void> {
       {
         id: usuario.id,
         email: usuario.email,
+        admin: usuario.admin
       },
       JWT_SECRET,
       {

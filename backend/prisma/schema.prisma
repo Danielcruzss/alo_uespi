@@ -35,6 +35,7 @@ model Usuario {
   nome     String   @db.VarChar(120)
   email    String   @unique @db.VarChar(180)
   senha    String   @db.VarChar(255)
+  admin  Boolean @default(false)
   criadoEm DateTime @default(now()) @map("criado_em")
 
   manifestacoes Manifestacao[]
