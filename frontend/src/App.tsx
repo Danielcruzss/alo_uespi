@@ -9,7 +9,6 @@ import {
 
 import { NovaManifestacao } from './pages/NovaManifestacao';
 import { ConsultaProtocolo } from './pages/ConsultaProtocolo';
-import { User } from "lucide-react";
 import { Login } from "./pages/Login";
 import { Admin } from './pages/Admin';
 

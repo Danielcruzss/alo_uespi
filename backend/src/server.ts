@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { manifestacaoRoutes } from "./routes/manifestacaoRoutes";
+import { autenticacaoRoutes } from "./routes/autenticacaoRoutes";
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/manifestacoes", manifestacaoRoutes);
+app.use("/auth", autenticacaoRoutes);
 
 const PORT = 3333;
 

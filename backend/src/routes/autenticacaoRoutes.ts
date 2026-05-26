@@ -4,7 +4,7 @@ import {
     loginUsuario
 } from "../controllers/autenticacao";
 
-export const autenticacaoRouter = Router();
+export const autenticacaoRoutes = Router();
 
-autenticacaoRouter.post("/cadastrar", cadastrarUsuario);
-autenticacaoRouter.post("/login", loginUsuario);
+autenticacaoRoutes.post("/cadastro", cadastrarUsuario);
+autenticacaoRoutes.post("/login", loginUsuario);

@@ -14,49 +14,54 @@ export function Login() {
     const [sucesso, setSucesso] = useState("");
 
     async function enviar(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  event.preventDefault();
+
+  const formulario = event.currentTarget;
+
+  setErro("");
+  setSucesso("");
+
+  const form = new FormData(formulario);
+
+  const payload = {
+    nome: String(form.get("nome") || ""),
+    email: String(form.get("email") || ""),
+    senha: String(form.get("senha") || ""),
+  };
+
+  try {
+    if (modoCadastro) {
+      await api.post("/auth/cadastro", payload);
+
+      setErro("");
+      setSucesso("Cadastro realizado com sucesso. Agora faça login.");
+      setModoCadastro(false);
+      formulario.reset();
+      return;
+    }
+
+    const { data } = await api.post("/auth/login", {
+      email: payload.email,
+      senha: payload.senha,
+    });
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("usuario", JSON.stringify(data.usuario));
 
     setErro("");
+    setUsuario(data.usuario);
+    setSucesso("Login realizado com sucesso.");
+    formulario.reset();
+  } catch (error: any) {
+    console.log("Erro de autenticação:", error.response?.data || error);
+
     setSucesso("");
-
-    const form = new FormData(event.currentTarget);
-
-    const payload = {
-      nome: String(form.get("nome") || ""),
-      email: String(form.get("email") || ""),
-      senha: String(form.get("senha") || ""),
-    };
-
-    try {
-      if (modoCadastro) {
-        await api.post("/auth/cadastro", payload);
-
-        setSucesso("Cadastro realizado com sucesso. Agora faça login.");
-        setModoCadastro(false);
-        event.currentTarget.reset();
-        return;
-      }
-
-      const { data } = await api.post("/auth/login", {
-        email: payload.email,
-        senha: payload.senha,
-      });
-
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("usuario", JSON.stringify(data.usuario));
-
-      setUsuario(data.usuario);
-      setSucesso("Login realizado com sucesso.");
-      event.currentTarget.reset();
-    } catch (error: any) {
-      console.log("Erro de autenticação:", error.response?.data || error);
-
-      setErro(
-        error.response?.data?.message ||
-          "Não foi possível concluir a operação."
-      );
-    }
+    setErro(
+      error.response?.data?.message ||
+        "Não foi possível concluir a operação."
+    );
   }
+}
 
   function sair() {
     localStorage.removeItem("token");
