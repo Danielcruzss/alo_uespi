@@ -33,68 +33,96 @@ A plataforma busca aumentar a transparência, acessibilidade e eficiência na co
 
 - React
 - TypeScript
-- Tailwind CSS
+- CSS
 - Vite
 - Express
+- MariaDB
+- Prisma ORM
 
 ---
 
-Antes de iniciar tenha instalado: node.js, npm, docker e git
+## 📋 Pré-requisitos
 
-### Clone o repositório
+Antes de iniciar, tenha instalado:
+
+- Node.js
+- npm
+- Docker
+- Git
+
+---
+
+## 📥 Clone o Repositório
 
 ```bash
 git clone https://github.com/Danielcruzss/alo_uespi.git
+```
 
 ---
 
 ## ⚙️ Como Executar o Projeto
 
-Iniciar o banco de dados
+### 1. Iniciar o banco de dados
+
 ```bash
 sudo docker start alo-mariadb
+```
 
-Sincronizar prisma com o banco
+### 2. Sincronizar Prisma com o banco
+
 ```bash
 npx prisma db push
 npx prisma generate
+```
 
-Instalar dependências e tipagens
+### 3. Instalar dependências
+
 ```bash
 cd backend
 npm install
-cd frontend
-npm install
 
-Iniciar backend e frontend
+cd ../frontend
+npm install
+```
+
+### 4. Iniciar backend e frontend
+
+#### Backend
+
 ```bash
 cd backend
 npm run dev
+```
+
+#### Frontend
+
+```bash
 cd frontend
 npm run dev -- --host
+```
 
-
+---
 
 ## 🏗️ Arquitetura da Solução
 
 ```mermaid
 flowchart TB
 
-    USER[👨‍🎓 Usuários<br/>Alunos • Professores • Técnicos]
+    USER[Usuários]
 
-    subgraph FRONTEND["🌐 Frontend"]
-        WEB[Interface Web<br/>React / Next.js]
+    subgraph FRONTEND["Frontend"]
+        WEB[Interface Web]
         OUV[Ouvidoria]
         PERFIL[Perfil do Usuário]
     end
 
-    subgraph BACKEND["⚙️ Backend / API"]
-        API[API REST<br/>Node.js + Express]
+    subgraph BACKEND["Backend / API"]
+        API[API REST]
         AUTH[Autenticação JWT]
         PROTO[Gerenciamento de Protocolos]
     end
 
-    subgraph DATABASE["🗄️ Banco de Dados"]
+    subgraph DATABASE["Banco de Dados"]
         DB[(MariaDB)]
     end
 
@@ -112,3 +140,9 @@ flowchart TB
     AUTH --> DB
     PROTO --> DB
 ```
+
+---
+
+## 👥 Equipe
+
+Projeto desenvolvido por Daniel, Guilherme, Mateus e Raul para o Hackathon do Piauí para o mundo.
