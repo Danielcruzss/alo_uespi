@@ -106,6 +106,7 @@ export async function loginUsuario(req: Request, res: Response): Promise<void> {
         id: usuario.id,
         nome: usuario.nome,
         email: usuario.email,
+        admin: usuario.admin,
       },
     });
     return;

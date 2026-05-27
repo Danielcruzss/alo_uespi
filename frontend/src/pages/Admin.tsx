@@ -107,76 +107,62 @@ export function Admin() {
   }, []);
 
   return (
-    <section className="card">
-      <h2>Painel administrativo</h2>
+    <section className="card admin-card">
+      <div className="admin-header">
+        <div>
+          <h2>Painel administrativo</h2>
 
-      <p className="muted">
-        Acompanhe, atualize e responda às manifestações registradas na plataforma.
-      </p>
+          <p className="muted">
+            Acompanhe, atualize e responda às manifestações registradas na plataforma.
+          </p>
+        </div>
+
+        <span className="admin-count">
+          {items.length} manifestação{items.length === 1 ? '' : 'es'}
+        </span>
+      </div>
 
       {erro && <div className="error">{erro}</div>}
 
-      <div className="table-wrapper">
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Protocolo</th>
-              <th>Tipo</th>
-              <th>Título</th>
-              <th>Setor</th>
-              <th>Prioridade</th>
-              <th>Status</th>
-              <th>Resposta</th>
-              <th>Ação</th>
-            </tr>
-          </thead>
+      <div className="admin-list">
+        {items.map((item) => (
+          <article key={item.id} className="admin-item">
+            <div className="admin-item-main">
+              <div>
+                <span className="admin-label">Protocolo</span>
+                <strong>{item.protocolo}</strong>
+              </div>
 
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id}>
-                <td>{item.protocolo}</td>
-                <td>{item.tipo}</td>
-                <td>{item.titulo}</td>
-                <td>{item.setor?.nome || 'Não definido'}</td>
+              <div>
+                <span className="admin-label">Tipo</span>
+                <strong>{item.tipo}</strong>
+              </div>
 
-                <td>
-                  <span className="pill">{item.prioridade}</span>
-                </td>
+              <div>
+                <span className="admin-label">Título</span>
+                <strong>{item.titulo}</strong>
+              </div>
 
-                <td>{item.status}</td>
+              <div>
+                <span className="admin-label">Setor</span>
+                <strong>{item.setor?.nome || 'Não definido'}</strong>
+              </div>
 
-                <td>
-                  <div className="admin-response-box">
-                    {item.resposta && (
-                      <div className="current-response">
-                        <strong>Resposta atual:</strong>
-                        <p>{item.resposta}</p>
-                      </div>
-                    )}
+              <div>
+                <span className="admin-label">Prioridade</span>
+                <span className={`pill priority-${item.prioridade.toLowerCase()}`}>
+                  {item.prioridade}
+                </span>
+              </div>
 
-                    <textarea
-                      value={respostas[item.id] || ''}
-                      onChange={(e) =>
-                        setRespostas({
-                          ...respostas,
-                          [item.id]: e.target.value,
-                        })
-                      }
-                      placeholder="Digite a resposta"
-                    />
+              <div>
+                <span className="admin-label">Status</span>
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        responder(item.id, respostas[item.id] || '')
-                      }
-                    >
-                      Responder
-                    </button>
-                  </div>
-                </td>
+                <div className="admin-status-box">
+                  <span className={`status-badge status-${item.status.toLowerCase()}`}>
+                    {item.status.replace('_', ' ')}
+                  </span>
 
-                <td className="admin-actions">
                   <select
                     value={item.status}
                     onChange={(e) => atualizar(item.id, e.target.value)}
@@ -187,19 +173,45 @@ export function Admin() {
                     <option value="RESPONDIDA">Respondida</option>
                     <option value="FINALIZADA">Finalizada</option>
                   </select>
-                </td>
-              </tr>
-            ))}
+                </div>
+              </div>
+            </div>
 
-            {items.length === 0 && (
-              <tr>
-                <td colSpan={8}>
-                  Nenhuma manifestação encontrada.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+            <div className="admin-response-area">
+              {item.resposta && (
+                <div className="current-response">
+                  <strong>Resposta atual:</strong>
+                  <p>{item.resposta}</p>
+                </div>
+              )}
+
+              <textarea
+                value={respostas[item.id] || ''}
+                onChange={(e) =>
+                  setRespostas({
+                    ...respostas,
+                    [item.id]: e.target.value,
+                  })
+                }
+                placeholder="Digite a resposta"
+              />
+
+              <button
+                type="button"
+                className="admin-response-button"
+                onClick={() => responder(item.id, respostas[item.id] || '')}
+              >
+                Responder
+              </button>
+            </div>
+          </article>
+        ))}
+
+        {items.length === 0 && (
+          <div className="empty-table">
+            Nenhuma manifestação encontrada.
+          </div>
+        )}
       </div>
     </section>
   );

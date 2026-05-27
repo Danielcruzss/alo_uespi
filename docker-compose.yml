@@ -4,7 +4,7 @@ services:
     container_name: alo_uespi_mariadb
     restart: always
     environment:
-      MARIADB_ROOT_PASSWORD: root
+      MARIADB_ROOT_PASSWORD: 123456
       MARIADB_DATABASE: alo_uespi
       MARIADB_USER: alo_user
       MARIADB_PASSWORD: alo_password

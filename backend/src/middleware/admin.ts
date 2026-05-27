@@ -1,11 +1,16 @@
 import { Request, Response, NextFunction } from "express";
+import { AuthRequest } from "./autenticador2";
 
-export function adminOnly(req: any, res: Response, next: NextFunction) {
-
+export function adminOnly(
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): void {
   if (!req.admin) {
-    return res.status(403).json({
-      erro: "Apenas administradores"
+    res.status(403).json({
+      message: "Acesso permitido apenas para administradores.",
     });
+    return;
   }
 
   next();

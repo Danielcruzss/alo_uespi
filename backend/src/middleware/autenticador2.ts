@@ -77,8 +77,7 @@ export function autenticarUsuarioOpcional(
     req.usuarioId = decoded.id;
     req.admin = decoded.admin || false;
   } catch {
-    // Se o token estiver inválido, segue sem usuário.
-    // Isso permite manifestações anônimas.
+    
   }
 
   next();

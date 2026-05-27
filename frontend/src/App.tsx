@@ -17,7 +17,7 @@ type Tela = 'inicio' | 'nova' | 'consulta' | 'admin' | 'login';
 function Inicio() {
   return (
     <section className="card">
-      <h2>Bem-vindo ao Alô UESPI</h2>
+      <h2>Bem-vindo ao ALÔ UESPI</h2>
 
       <p className="muted">
         O Alô UESPI é uma plataforma digital de ouvidoria universitária criada
@@ -82,7 +82,7 @@ export function App() {
         <div>
           <span className="badge">Site de Ouvidoria da UESPI</span>
 
-          <h1>Alô UESPI</h1>
+          <h1>ALÔ UESPI</h1>
 
           <p>
             Registre e acompanhe manifestações acadêmicas em uma plataforma
