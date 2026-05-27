@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ClipboardList,
   Search,
@@ -9,10 +9,17 @@ import {
 
 import { NovaManifestacao } from './pages/NovaManifestacao';
 import { ConsultaProtocolo } from './pages/ConsultaProtocolo';
-import { Login } from "./pages/Login";
+import { Login } from './pages/Login';
 import { Admin } from './pages/Admin';
 
 type Tela = 'inicio' | 'nova' | 'consulta' | 'admin' | 'login';
+
+type UsuarioLogado = {
+  id: number;
+  nome: string;
+  email: string;
+  admin?: boolean;
+};
 
 function Inicio() {
   return (
@@ -75,6 +82,33 @@ function Inicio() {
 
 export function App() {
   const [tela, setTela] = useState<Tela>('inicio');
+  const [usuario, setUsuario] = useState<UsuarioLogado | null>(null);
+
+  function carregarUsuarioLogado() {
+    const usuarioSalvo = sessionStorage.getItem('usuario');
+
+    if (!usuarioSalvo) {
+      setUsuario(null);
+      return;
+    }
+
+    try {
+      setUsuario(JSON.parse(usuarioSalvo));
+    } catch {
+      setUsuario(null);
+    }
+  }
+
+  function trocarTela(novaTela: Tela) {
+    carregarUsuarioLogado();
+    setTela(novaTela);
+  }
+
+  useEffect(() => {
+    carregarUsuarioLogado();
+  }, [tela]);
+
+  const usuarioEhAdmin = usuario?.admin === true;
 
   return (
     <div className="app">
@@ -93,49 +127,66 @@ export function App() {
 
       <nav className="tabs">
         <button
-          onClick={() => setTela('inicio')}
+          type="button"
+          onClick={() => trocarTela('inicio')}
           className={tela === 'inicio' ? 'active' : ''}
         >
           <Home size={18} /> Início
         </button>
 
         <button
-          onClick={() => setTela('nova')}
+          type="button"
+          onClick={() => trocarTela('nova')}
           className={tela === 'nova' ? 'active' : ''}
         >
           <ClipboardList size={18} /> Registrar
         </button>
 
         <button
-          onClick={() => setTela('consulta')}
+          type="button"
+          onClick={() => trocarTela('consulta')}
           className={tela === 'consulta' ? 'active' : ''}
         >
           <Search size={18} /> Consultar protocolo
         </button>
 
-        <button
-          onClick={() => setTela('admin')}
-          className={tela === 'admin' ? 'active' : ''}
-        >
-          <ShieldCheck size={18} /> Painel admin
-        </button>
-
-        <button 
-          onClick={() => setTela ("login")}
-          className={tela == 'login' ? 'active' : ''}
+        {usuarioEhAdmin && (
+          <button
+            type="button"
+            onClick={() => trocarTela('admin')}
+            className={tela === 'admin' ? 'active' : ''}
           >
-            <User size={18} /> Entrar
-            </button>
+            <ShieldCheck size={18} /> Painel admin
+          </button>
+        )}
 
+        <button
+          type="button"
+          onClick={() => trocarTela('login')}
+          className={tela === 'login' ? 'active' : ''}
+        >
+          <User size={18} /> Entrar
+        </button>
       </nav>
 
       <main>
         {tela === 'inicio' && <Inicio />}
         {tela === 'nova' && <NovaManifestacao />}
         {tela === 'consulta' && <ConsultaProtocolo />}
-        {tela === 'admin' && <Admin />}
+
+        {tela === 'admin' && usuarioEhAdmin && <Admin />}
+
+        {tela === 'admin' && !usuarioEhAdmin && (
+          <section className="card">
+            <h2>Acesso restrito</h2>
+            <p className="muted">
+              O painel administrativo está disponível apenas para usuários
+              administradores.
+            </p>
+          </section>
+        )}
+
         {tela === 'login' && <Login />}
-        
       </main>
     </div>
   );

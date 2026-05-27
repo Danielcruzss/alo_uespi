@@ -25,7 +25,7 @@ export function NovaManifestacao() {
     };
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
 
       if (!anonima && !token) {
         setErro(

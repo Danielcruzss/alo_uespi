@@ -13,7 +13,7 @@ export function Login() {
     const [erro, setErro] = useState("");
     const [sucesso, setSucesso] = useState("");
     useEffect(() => {
-    const usuarioSalvo = localStorage.getItem("usuario");
+    const usuarioSalvo = sessionStorage.getItem("usuario");
 
     if (usuarioSalvo) {
       setUsuario(JSON.parse(usuarioSalvo));
@@ -52,8 +52,8 @@ export function Login() {
       senha: payload.senha,
     });
 
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("usuario", JSON.stringify(data.usuario));
+    sessionStorage.setItem("token", data.token);
+    sessionStorage.setItem("usuario", JSON.stringify(data.usuario));
 
     setErro("");
     setUsuario(data.usuario);
@@ -71,8 +71,8 @@ export function Login() {
 }
 
   function sair() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("usuario");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("usuario");
     setUsuario(null);
     setSucesso("");
     setErro("");
