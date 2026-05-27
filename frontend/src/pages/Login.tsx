@@ -2,80 +2,101 @@ import { FormEvent, useEffect, useState } from "react";
 import { api } from "../api/client";
 
 type Usuario = {
-    id: number;
-    nome: string;
-    email: string;
+  id: number;
+  nome: string;
+  email: string;
+  admin?: boolean;
 };
 
 export function Login() {
-    const [modoCadastro, setModoCadastro] = useState(false);
-    const [usuario, setUsuario] = useState<Usuario | null>(null);
-    const [erro, setErro] = useState("");
-    const [sucesso, setSucesso] = useState("");
-    useEffect(() => {
+  const [modoCadastro, setModoCadastro] = useState(false);
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const [erro, setErro] = useState("");
+  const [sucesso, setSucesso] = useState("");
+
+  function carregarUsuarioSalvo() {
     const usuarioSalvo = sessionStorage.getItem("usuario");
 
-    if (usuarioSalvo) {
-      setUsuario(JSON.parse(usuarioSalvo));
-    }
-  }, []);
-
-    async function enviar(event: FormEvent<HTMLFormElement>) {
-  event.preventDefault();
-
-  const formulario = event.currentTarget;
-
-  setErro("");
-  setSucesso("");
-
-  const form = new FormData(formulario);
-
-  const payload = {
-    nome: String(form.get("nome") || ""),
-    email: String(form.get("email") || ""),
-    senha: String(form.get("senha") || ""),
-  };
-
-  try {
-    if (modoCadastro) {
-      await api.post("/auth/cadastro", payload);
-
-      setErro("");
-      setSucesso("Cadastro realizado com sucesso. Agora faça login.");
-      setModoCadastro(false);
-      formulario.reset();
+    if (!usuarioSalvo) {
+      setUsuario(null);
       return;
     }
 
-    const { data } = await api.post("/auth/login", {
-      email: payload.email,
-      senha: payload.senha,
-    });
+    try {
+      setUsuario(JSON.parse(usuarioSalvo));
+    } catch {
+      sessionStorage.removeItem("usuario");
+      sessionStorage.removeItem("token");
+      setUsuario(null);
+    }
+  }
 
-    sessionStorage.setItem("token", data.token);
-    sessionStorage.setItem("usuario", JSON.stringify(data.usuario));
+  useEffect(() => {
+    carregarUsuarioSalvo();
+  }, []);
+
+  async function enviar(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const formulario = event.currentTarget;
 
     setErro("");
-    setUsuario(data.usuario);
-    setSucesso("Login realizado com sucesso.");
-    formulario.reset();
-  } catch (error: any) {
-    console.log("Erro de autenticação:", error.response?.data || error);
-
     setSucesso("");
-    setErro(
-      error.response?.data?.message ||
-        "Não foi possível concluir a operação."
-    );
+
+    const form = new FormData(formulario);
+
+    const payload = {
+      nome: String(form.get("nome") || ""),
+      email: String(form.get("email") || ""),
+      senha: String(form.get("senha") || ""),
+    };
+
+    try {
+      if (modoCadastro) {
+        await api.post("/auth/cadastro", payload);
+
+        setErro("");
+        setSucesso("Cadastro realizado com sucesso. Agora faça login.");
+        setModoCadastro(false);
+        formulario.reset();
+        return;
+      }
+
+      const { data } = await api.post("/auth/login", {
+        email: payload.email,
+        senha: payload.senha,
+      });
+
+      sessionStorage.setItem("token", data.token);
+      sessionStorage.setItem("usuario", JSON.stringify(data.usuario));
+
+      setErro("");
+      setUsuario(data.usuario);
+      setSucesso("Login realizado com sucesso.");
+
+      window.dispatchEvent(new Event("auth-change"));
+
+      formulario.reset();
+    } catch (error: any) {
+      console.log("Erro de autenticação:", error.response?.data || error);
+
+      setSucesso("");
+      setErro(
+        error.response?.data?.message ||
+          "Não foi possível concluir a operação."
+      );
+    }
   }
-}
 
   function sair() {
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("usuario");
+
     setUsuario(null);
     setSucesso("");
     setErro("");
+
+    window.dispatchEvent(new Event("auth-change"));
   }
 
   if (usuario) {
@@ -88,6 +109,18 @@ export function Login() {
         </p>
 
         <p className="muted">{usuario.email}</p>
+
+        {usuario.admin && (
+          <div className="success">
+            Este usuário possui acesso de administrador.
+          </div>
+        )}
+
+        {!usuario.admin && (
+          <p className="muted">
+            Este usuário possui acesso comum.
+          </p>
+        )}
 
         <button type="button" onClick={sair}>
           Sair
@@ -133,9 +166,7 @@ export function Login() {
           setSucesso("");
         }}
       >
-        {modoCadastro
-          ? "Já tenho conta"
-          : "Ainda não tenho conta"}
+        {modoCadastro ? "Já tenho conta" : "Ainda não tenho conta"}
       </button>
 
       {sucesso && <div className="success">{sucesso}</div>}

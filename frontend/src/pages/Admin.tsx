@@ -39,7 +39,7 @@ export function Admin() {
 
   async function atualizar(id: number, status: string) {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
 
       if (!token) {
         setErro('Você precisa estar logado como administrador.');
@@ -66,7 +66,7 @@ export function Admin() {
 
   async function responder(id: number, resposta: string) {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
 
       if (!token) {
         setErro('Você precisa estar logado como administrador.');
